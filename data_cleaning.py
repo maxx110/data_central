@@ -26,7 +26,34 @@ class DataCleaning:
 
         return pdf_data
 
-    
+    def convert_product_weights(self, product_df):
+        # Clean up the weight column
+        product_df['weight'] = product_df['weight'].astype(str)
+        product_df['weight'] = product_df['weight'].str.replace(r'[^0-9.]+', '')
+        # Convert weights to decimal values representing kg
+        def convert_weight(value):
+            try:
+                weight = float(value)
+                if 'g' in value or 'ml' in value:
+                    weight /= 1000
+                return weight
+            except ValueError:
+                return value
+
+        product_df['weight'] = product_df['weight'].apply(convert_weight)
+
+        # # convert to decimal
+        # product_df['weight'] = product_df['weight'].apply(lambda x: x.replace('kg', '') if isinstance(x, str) and 'kg' in x else x)
+        # product_df['weight'] = product_df['weight'].apply(lambda x: x.replace('g', '') if isinstance(x, str) and 'g' in x else x)
+        # product_df['weight'] = product_df['weight'].apply(lambda x: x.replace('ml', '') if isinstance(x, str) and 'ml' in x else x)
+        # product_df['weight'] = product_df['weight'].apply(lambda x: float(x) / 1000 if 'g' in x or 'ml' in x else float(x))
+
+
+        #product_df['weight'] = product_df['weight'].apply(lambda x: float(x) / 1000 if isinstance(x, str) and ('g' in x or 'ml' in x) else float(x))
+
+        
+
+        return product_df 
 
 
     
@@ -84,6 +111,12 @@ def main():
     # pdf_cleaned_data.to_csv("pdf_cleaned_data.csv", index=False)  # Replace with the desired path and filename
 
 
+    #Saving from s3 with bucket name
+    bucket_address = 's3://data-handling-public/products.csv'
+    product_df = extractor.extract_from_s3(bucket_address)
+
+    product_df = cleaner.convert_product_weights(product_df)
+    print(product_df)
 
 if __name__ == "__main__":
     main()

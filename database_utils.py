@@ -181,7 +181,23 @@ class DatabaseConnector:
         # Close the cursor
         cursor.close()
 
+    def list_tables(self):
+        t_connection = self.init_db_connection()
+        if t_connection is None or t_connection.closed != 0:
+            print("Error: No active database connection.")
+            return
 
+        cursor = t_connection.cursor()
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
+        tables = cursor.fetchall()
+        cursor.close()
+
+        if tables:
+            print("Tables in the database:")
+            for table in tables:
+                print(table[0])
+        else:
+            print("No tables found in the database.")    
 
     def start(self):
         # self.list_tables()
@@ -193,4 +209,6 @@ if __name__ == "__main__":
     extractor = DatabaseConnector()
 
     # Start the extraction process
-    extractor.start()
+    #extractor.start()
+
+    extractor.list_tables()
