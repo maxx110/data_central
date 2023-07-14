@@ -98,7 +98,7 @@ class DataExtractor:
             return None
 
 
-            
+
 
 
 
