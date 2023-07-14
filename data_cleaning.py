@@ -39,7 +39,7 @@ class DataCleaning:
                 return weight
             except ValueError:
                 return value
-
+ 
         product_df['weight'] = product_df['weight'].apply(convert_weight)
 
         # # convert to decimal
